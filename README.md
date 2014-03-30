@@ -7,7 +7,7 @@ Hold shift and right click the folder and select "Open Command Window Here"
 
 Type "git init" in the command prompt
 
-Type "git remote add origin https://github.com/Cryton/Budren-Of-Command.git"
+Type "git remote add origin https://github.com/Cryton/Burden-Of-Command.git"
 
 Type "git pull origin master"
 
