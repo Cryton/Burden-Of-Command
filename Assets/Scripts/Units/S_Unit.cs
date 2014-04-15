@@ -2,28 +2,27 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class S_BasicUnit : MonoBehaviour {
-	public bool isSelected,destroyed,enemy,air,tank,nonComb;
-	Vector3 target,movePoint;
-	bool moving;
+public class S_Unit : MonoBehaviour {
+	public bool isSelected,destroyed,enemy;
+	public Vector3 target,movePoint;
 	public GameObject circle,boom,smoke;
 	public List<GameObject> targetList;
-	public float range,health;
-	float deathTimer;
+	public float health,deathTimer;
+	// Use this for initialization
 	void Start () 
 	{
-
+	
 	}
 	
 	// Update is called once per frame
-	void Update () 
+	public virtual void Update () 
 	{
 		if(destroyed)
 		{
 			deathTimer += Time.deltaTime;
 			isSelected = false;
 			tag = "Junk";
-
+			
 			if(deathTimer > 10)
 			{
 				Destroy(gameObject);
@@ -41,59 +40,40 @@ public class S_BasicUnit : MonoBehaviour {
 			{
 				circle.renderer.enabled = true;
 			}
-			if(moving)
-			{
-				Moving(movePoint);
-			}
 			else
 			{
 				circle.renderer.enabled = false;
 			}
-			if(targetList.Count != 0&&nonComb)
+			if(targetList.Count != 0)
 			{
 				Attack();
 			}
+
 		}
 	}
-	public void Move(Vector3 point)
+	public virtual void Move(Vector3 targ)
 	{
-		if(!air)
-		{
-			AIPath pathing = transform.GetComponent<AIPath>();
-			pathing.target = point;
-		}
-		else
-		{
-			point.y += 55;
-			transform.LookAt(point);
-			moving = true;
-			movePoint = point;
-		}
+		AIPath pathing = transform.GetComponent<AIPath>();
+		pathing.target = targ;
 	}
-	public void Moving(Vector3 targetPoint)
+	public virtual void Attack()
 	{
-		if(Vector3.Distance(targetPoint,transform.position) > 5)
+		if(targetList.Count != 0)
 		{
-			transform.Translate(Vector3.forward*5);
-		}
-		else
-		{
-			moving = false;
-		}
-	}
-	public void Attack()
-	{
-		if(targetList[0].tag == "Junk")
-		{
-			targetList.RemoveAt(0);
-		}
-			S_Weapon gun = gameObject.GetComponent<S_Weapon>();
-		//	S_Turret gun2 = gameObject.GetComponent<S_Turret>();
-		//	gun2.target = targetList[0].transform;
+			if(targetList[0].tag == "Junk")
+			{
+				targetList.RemoveAt(0);
+			}
+			S_Weapon gun = transform.GetComponent<S_Weapon>();
 			if(gun.CheckSight(targetList[0]))
 			{
 				gun.attack = true;
 			}
+			else
+			{
+				gun.attack = false;
+			}
+		}
 
 	}
 	void OnTriggerEnter(Collider other)
