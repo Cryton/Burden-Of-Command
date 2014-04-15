@@ -55,10 +55,10 @@ public class S_Selector : MonoBehaviour {
 			{
 				foreach(GameObject g in selectedUnits)
 				{
-					S_BasicUnit unit = g.GetComponent<S_BasicUnit>();
+					S_Unit unit = g.GetComponent<S_Unit>();
 					if(!unit)
 					{
-						unit = g.transform.parent.GetComponent<S_BasicUnit>();
+						unit = g.transform.parent.GetComponent<S_Unit>();
 					}
 					if(selectedUnits.Count > 1)
 					{
@@ -140,10 +140,10 @@ public class S_Selector : MonoBehaviour {
 		}
 		foreach(GameObject uni in selectedUnits)
 		{
-			S_BasicUnit unit = uni.GetComponent<S_BasicUnit>();
+			S_Unit unit = uni.GetComponent<S_Unit>();
 			if(!unit)
 			{
-				unit = uni.transform.parent.GetComponent<S_BasicUnit>();
+				unit = uni.transform.parent.GetComponent<S_Unit>();
 			}
 			unit.isSelected = true;
 
@@ -155,10 +155,10 @@ public class S_Selector : MonoBehaviour {
 	{
 		foreach(GameObject uni in selectedUnits)
 		{
-			S_BasicUnit unit = uni.GetComponent<S_BasicUnit>();
+			S_Unit unit = uni.GetComponent<S_Unit>();
 			if(!unit)
 			{
-				unit = uni.transform.parent.GetComponent<S_BasicUnit>();
+				unit = uni.transform.parent.GetComponent<S_Unit>();
 			}
 			unit.isSelected = false;
 		}

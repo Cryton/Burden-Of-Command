@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class S_BasicUnit : MonoBehaviour {
-	public bool isSelected,destroyed,enemy,air,tank;
+	public bool isSelected,destroyed,enemy,air,tank,nonComb;
 	Vector3 target,movePoint;
 	bool moving;
 	public GameObject circle,boom,smoke;
@@ -49,7 +49,7 @@ public class S_BasicUnit : MonoBehaviour {
 			{
 				circle.renderer.enabled = false;
 			}
-			if(targetList.Count != 0)
+			if(targetList.Count != 0&&nonComb)
 			{
 				Attack();
 			}
@@ -88,8 +88,8 @@ public class S_BasicUnit : MonoBehaviour {
 			targetList.RemoveAt(0);
 		}
 			S_Weapon gun = gameObject.GetComponent<S_Weapon>();
-			S_Turret gun2 = gameObject.GetComponent<S_Turret>();
-			gun2.target = targetList[0].transform;
+		//	S_Turret gun2 = gameObject.GetComponent<S_Turret>();
+		//	gun2.target = targetList[0].transform;
 			if(gun.CheckSight(targetList[0]))
 			{
 				gun.attack = true;
