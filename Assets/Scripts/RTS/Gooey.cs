@@ -105,7 +105,7 @@ public class Gooey : MonoBehaviour {
 				settings = true;
 			}
 			else if (escapegrid == 2)
-				Application.LoadLevel("Menu");
+				Application.LoadLevel("MainMenu");
 		}
 		else if(settings)
 		{

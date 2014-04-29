@@ -1,12 +1,17 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using System.Collections;
-
+using UnityEditor;
 public class Gooey : MonoBehaviour {
 
 	public Camera MainCamera;
+	public GameObject cam1;
+	public GameObject cam2;
+	public GameObject camBox;
 	public GameObject fpsController;
 	public GameObject[] units;
 	public Texture[] uPics;
+	GameObject clicked;
 	GameObject temp;
 	Rect commandBox,unitBox,mapBox,escapeBox,mapBox2,settingsBox,graphicsBox,audioBox,storeBox;
 	float CBwidth, CBheight ,UBwidth, UBheight, renderDistance, MusicVolume, SoundVolume;
@@ -17,20 +22,20 @@ public class Gooey : MonoBehaviour {
 	string[] selStrings, escapeString;
 	public Texture2D image;
 	public GUISkin skin, skin2;
-	bool escape,settings, anisotropic,fullScreen,store;
+	bool escape,settings, anisotropic,fullScreen,store,active;
 	public bool RTS;
-	public GameObject cam1,cam2;
 	float timer;
 	public bool paused;
 	int sPage;
-
+	int picToDraw;
 	RaycastHit hit;
-	Vector3 sPos = new Vector3(1184,10,1180);
+	Vector3 sPos = new Vector3(1220,145,1738);
 	// Use this for initialization
 	void Start () {
 		AA = 0;
 		anisotropic = false;
 		escape = false;
+		active = false;
 		fullScreen = true;
 		renderDistance = 1000;
 		resoW = "1920";
@@ -42,6 +47,7 @@ public class Gooey : MonoBehaviour {
 
 	void Setup(int width, int height)
 	{
+		picToDraw = 3;
 		CBwidth = width/2;
 		CBheight = height/4;
 		UBwidth = width/4;
@@ -64,8 +70,36 @@ public class Gooey : MonoBehaviour {
 
 		if(Input.GetMouseButtonDown (0) )
 		{
-			if (Physics.Raycast(MainCamera.ScreenPointToRay(Input.mousePosition), out hit, 100))
-				sPos = hit.point;
+			if (Physics.Raycast(MainCamera.ScreenPointToRay(Input.mousePosition), out hit, 500))
+			{
+				//sPos = hit.point;
+				if (hit.collider.gameObject.CompareTag("PlayerUnit"))
+				{
+					Debug.Log("Hit");
+					clicked = hit.collider.gameObject;
+					switch(clicked.name)
+					{
+					case "apc-01-max7.max":
+						picToDraw = 0;
+						break;
+					case "apc-02-max7.max":
+						picToDraw = 1;
+						break;
+					case "engineering-01-max7.max":
+						picToDraw = 2;
+						break;
+					case "apc-aa-01-max7.max":
+						picToDraw = 3;
+						break;
+					case "jeep-01-max7.max":
+						picToDraw = 4;
+						break;
+					case "jeep-02-max7.max":
+						picToDraw = 5;
+						break;
+					}
+				}
+			}
 		}
 		timer+= Time.deltaTime;
 		if(Input.GetKeyDown(KeyCode.Escape))
@@ -82,6 +116,18 @@ public class Gooey : MonoBehaviour {
 			SwitchModes();
 			timer = 0;
 		}		
+		if(active)
+		{
+			if(Input.GetKey(KeyCode.F))
+				camBox.transform.Translate(0,0,5);
+			if(Input.GetKey(KeyCode.H))
+				camBox.transform.Translate(0,0,-5);
+			if(Input.GetKey(KeyCode.T))
+				camBox.transform.Translate(5,0,0);
+			if(Input.GetKey(KeyCode.G))
+				camBox.transform.Translate(-5,0,0);
+		}
+		
 	}
 
 	void OnGUI()
@@ -92,8 +138,9 @@ public class Gooey : MonoBehaviour {
 			GUI.Box(commandBox,"Commands");
 			grid = GUI.SelectionGrid(new Rect(commandBox.x + (commandBox.width - commandBox.width/2)/2, commandBox.y + (commandBox.height-commandBox.height/1.5f)/2 ,commandBox.width/2,commandBox.height/1.5f), grid, selStrings, 4);
 			GUI.Box(unitBox,"Current Unit Image/Stats");
-			GUI.Box(new Rect(unitBox.x + unitBox.width/20, unitBox.y + unitBox.height/10, unitBox.width*.4f, unitBox.height*.95f), image);
-			GUI.Box(new Rect(unitBox.x + unitBox.width/20*2 + unitBox.width*.4f, unitBox.y + unitBox.height/10, unitBox.width*.5f, unitBox.height*.95f), "Unit Stats will go here" +"\r\n"+"\r\n"  + "Austin this week did RTS UI, Credits Video and different Options buttons" + "\r\n"+"\r\n"+ "Austin Next week is doing FPS UI/Button effects for a prettier UI"+"\r\n" +"\r\n" + "Goodbye Studio! PS. Don't trust Mr. Day" );
+			Texture2D tex = AssetPreview.GetAssetPreview(clicked);
+			GUI.Box(new Rect(unitBox.x + unitBox.width/20, unitBox.y + unitBox.height/10, unitBox.width*.4f, unitBox.height*.95f), uPics[picToDraw]);
+			GUI.Box(new Rect(unitBox.x + unitBox.width/20*2 + unitBox.width*.4f, unitBox.y + unitBox.height/10, unitBox.width*.5f, unitBox.height*.95f), "Health = 100");
 			GUI.Box(mapBox,"Map");
 		}
 		if(!RTS)
@@ -115,7 +162,6 @@ public class Gooey : MonoBehaviour {
 			{
 				if(GUI.Button(new Rect(storeBox.x+storeBox.width/8*i,storeBox.y + storeBox.y/1.8f,storeBox.width/8,storeBox.height/3), uPics[i]))
 				{
-					sPos.x +=5; sPos.z+=5;
 					temp = (Instantiate(units[i], sPos,new Quaternion(0,180,0,0))) as GameObject;
 				}
 			}
@@ -224,11 +270,21 @@ public class Gooey : MonoBehaviour {
 	
 	public void SwitchModes()
 	{
-		//S_Selector control = cam1.transform.GetComponent<S_Selector>();
-		//control.Deselect();
-		//RTS = !RTS;
-		//cam1.SetActive(!cam1.activeSelf);
-		//cam2.SetActive(!cam2.activeSelf);
+		RTS = !RTS;
+		cam1.SetActive(!cam1.activeSelf);
+		cam2.SetActive(!cam2.activeSelf);
+		active =!active;
+	}
+	public void rtsCamera()
+	{
+		if(Input.GetKeyDown(KeyCode.F))
+			camBox.transform.Translate(0,0,5);
+		if(Input.GetKeyDown(KeyCode.H))
+			camBox.transform.Translate(0,0,-5);
+		if(Input.GetKeyDown(KeyCode.T))
+			camBox.transform.Translate(5,0,0);
+		if(Input.GetKeyDown(KeyCode.G))
+			camBox.transform.Translate(-5,0,0);
 	}
 
 	public bool Escape
